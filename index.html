@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anurag Jha — DevOps & AIOps Engineer</title>
+<meta name="description" content="Anurag Jha — DevOps & AIOps engineer building cloud infrastructure that deploys, monitors, and heals itself.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- site-wide growing scroll spline -->
+<svg class="scroll-spline" id="scrollSpline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <path class="track" id="splineTrack"></path>
+  <path class="draw"  id="splineDraw"></path>
+  <circle class="halo" id="splineHalo" r="11"></circle>
+  <circle class="head" id="splineHead" r="4"></circle>
+</svg>
+
+<div class="cursor-ring" id="ring"></div>
+<div class="cursor-dot" id="dot"></div>
+
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand" data-cursor>anurag<span class="b">.jha</span></a>
+    <div class="nav-links">
+      <a href="#about">about</a>
+      <a href="#skills">skills</a>
+      <a href="#work">experience</a>
+      <a href="#projects">projects</a>
+      <a href="#contact">contact</a>
+      <span class="status"><span class="pulse"></span>available</span>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-glow"></div>
+  <svg class="telemetry" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+    <path id="telePath" d="M0,110 L180,110 200,60 215,140 235,90 260,110 L520,110 545,30 562,150 585,80 610,110 L900,110 922,55 940,135 962,95 985,110 L1240,110 1262,70 1280,120 1302,90 1325,110 L1440,110"/>
+  </svg>
+  <div class="wrap hero-content">
+    <div class="eyebrow" id="eyebrow">DEVOPS · AIOPS · CLOUD INFRASTRUCTURE</div>
+    <h1>
+      <span class="reveal-line"><span>Anurag Jha</span></span>
+    </h1>
+    <p class="hero-tag" id="tag">I build cloud infrastructure that <span class="hl">deploys itself</span>, watches itself, and recovers before anyone files a ticket.</p>
+    <p class="hero-sub" id="sub">DevOps & SecOps engineer working at the seam of automation and AI — turning manual ops into self-driving pipelines on AWS.</p>
+
+    <div class="readout" id="readout">
+      <div class="cell"><div class="val"><span class="arrow">▲</span>40%</div><div class="lbl">Deployment reliability</div></div>
+      <div class="cell"><div class="val"><span class="arrow down">▼</span>60%</div><div class="lbl">Manual deploy effort</div></div>
+      <div class="cell"><div class="val"><span class="arrow down">▼</span>50%</div><div class="lbl">Incident detection time</div></div>
+      <div class="cell"><div class="val"><span class="arrow">▲</span>30%</div><div class="lbl">Faster page loads</div></div>
+    </div>
+  </div>
+</header>
+
+<section class="blk" id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">About</h2>
+      <span class="sec-rule reveal-rule"></span>
+    </div>
+    <div class="about-grid">
+      <div class="about-body">
+        <p class="reveal">I'm a <strong>DevOps engineer</strong> based in Kathmandu who treats infrastructure as a product, not a chore. My work lives where reliable cloud architecture meets automation — designing AWS environments, wiring up CI/CD, and making deployments boring on purpose.</p>
+        <p class="reveal">Lately I've been pulling AI into the operations layer: <strong>AIOps</strong> systems that watch their own metrics, flag anomalies before they page a human, and resolve common incidents on their own. I've built monitoring agents, RAG pipelines, and a vector database from scratch in C++.</p>
+        <p class="reveal">I care about the unglamorous details — clean Terraform, hardened APIs, observability you can actually trust — because that's what lets teams ship fast without holding their breath.</p>
+      </div>
+      <aside class="about-aside reveal">
+        <div class="row"><span class="k">location</span><span class="v">Kathmandu, NP</span></div>
+        <div class="row"><span class="k">focus</span><span class="v">DevOps · AIOps</span></div>
+        <div class="row"><span class="k">cloud</span><span class="v">AWS</span></div>
+        <div class="row"><span class="k">degree</span><span class="v">B.E. Computer Eng.</span></div>
+        <div class="row"><span class="k">status</span><span class="v live">open to work</span></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">Stack</h2>
+      <span class="sec-rule reveal-rule"></span>
+    </div>
+    <div class="skill-grid" id="skillGrid">
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ cloud</div><h3>Cloud Infrastructure</h3>
+        <div class="tags"><span class="tag">AWS</span><span class="tag">EC2</span><span class="tag">VPC</span><span class="tag">RDS</span><span class="tag">S3</span><span class="tag">IAM</span><span class="tag">CloudFront</span></div>
+      </div>
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ devops</div><h3>DevOps & IaC</h3>
+        <div class="tags"><span class="tag">Terraform</span><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">GitHub Actions</span></div>
+      </div>
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ observe</div><h3>Monitoring</h3>
+        <div class="tags"><span class="tag">Prometheus</span><span class="tag">Grafana</span><span class="tag">CloudWatch</span><span class="tag">GuardDuty</span></div>
+      </div>
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ aiops</div><h3>AIOps</h3>
+        <div class="tags"><span class="tag">Anomaly detection</span><span class="tag">AI monitoring</span><span class="tag">Automation agents</span><span class="tag">MCP</span></div>
+      </div>
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ ai</div><h3>AI / ML</h3>
+        <div class="tags"><span class="tag">LLMs</span><span class="tag">RAG</span><span class="tag">Vector DB</span><span class="tag">LoRA / QLoRA</span></div>
+      </div>
+      <div class="skill-card reveal" data-cursor>
+        <div class="ico">/ code</div><h3>Languages & Automation</h3>
+        <div class="tags"><span class="tag">Python</span><span class="tag">Bash</span><span class="tag">C++</span><span class="tag">n8n</span><span class="tag">Zapier</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title">Pipeline</h2>
+      <span class="sec-rule reveal-rule"></span>
+    </div>
+    <div class="pipeline" id="pipeline">
+      <div class="pl-fill" id="plFill"></div>
+
+      <div class="stage reveal">
+        <div class="node"></div>
+        <div class="meta"><span class="when">Jun – Aug 2025</span><span>Leapfrog Technology</span></div>
+        <h3>DevOps & SecOps Fellow</h3>
+        <p class="co">Secure cloud infrastructure · DevSecOps</p>
+        <ul>
+          <li>Architected and deployed secure AWS infrastructure (VPC, EC2, RDS, IAM, S3) with multi-tier networking, lifting deployment reliability by 40%.</li>
+          <li>Built end-to-end CI/CD pipelines with GitHub Actions, cutting manual deployment effort by 60%.</li>
+          <li>Containerized apps with Docker behind an NGINX reverse proxy for better performance and scalability.</li>
+          <li>Stood up an observability stack (CloudWatch, GuardDuty, WAF), reducing incident detection time by 50%.</li>
+        </ul>
+      </div>
+
+      <div class="stage reveal">
+        <div class="node"></div>
+        <div class="meta"><span class="when">May – Nov 2025</span><span>Yes Digital Pty. Ltd. · Remote</span></div>
+        <h3>Technical SEO Specialist</h3>
+        <p class="co">Programmatic SEO · Performance engineering</p>
+        <ul>
+          <li>Resolved crawlability, indexing, and structured-data issues across large-scale websites.</li>
+          <li>Built programmatic SEO pipelines that generated landing pages at scale and grew organic visibility.</li>
+          <li>Improved Core Web Vitals (LCP, CLS) for up to 30% faster load times.</li>
+          <li>Automated SEO workflows in Python with analytics across GA4, GSC, and GTM.</li>
+        </ul>
+      </div>
+
+      <div class="stage reveal">
+        <div class="node"></div>
+        <div class="meta"><span class="when">Feb – Apr 2025</span><span>HCLTech</span></div>
+        <h3>AI/ML Intern — Deployment Focus</h3>
+        <p class="co">Model deployment · MLOps</p>
+        <ul>
+          <li>Dockerized and deployed ML models to Linux for reproducible, scalable inference.</li>
+          <li>Improved model accuracy by 12% using Optuna tuning and SHAP explainability.</li>
+          <li>Standardized ML pipelines and Git workflows for team-wide reproducibility.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="projects">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">Builds</h2>
+      <span class="sec-rule reveal-rule"></span>
+    </div>
+    <div class="proj-grid">
+      <article class="proj reveal" data-cursor>
+        <span class="pno">PRJ_01</span>
+        <h3>Health Insights AI Agent</h3>
+        <p>An AI-powered health monitoring agent using LLMs and agentic workflows for real-time insights, with automated data pipelines driving proactive analysis.</p>
+        <div class="stack"><span>LLMs</span><span>Agentic</span><span>Pipelines</span></div>
+      </article>
+      <article class="proj reveal" data-cursor>
+        <span class="pno">PRJ_02</span>
+        <h3>DevOps-AIOps Platform</h3>
+        <p>An AI-driven monitoring system with anomaly detection that cuts manual debugging, plus MCP-based troubleshooting agents for automated incident resolution.</p>
+        <div class="stack"><span>AIOps</span><span>MCP</span><span>Anomaly detection</span></div>
+      </article>
+      <article class="proj reveal" data-cursor>
+        <span class="pno">PRJ_03</span>
+        <h3>Vector DB with RAG</h3>
+        <p>A custom vector database engineered in C++ with embedding pipelines and RAG integration, fully containerized for consistent, deploy-anywhere environments.</p>
+        <div class="stack"><span>C++</span><span>Docker</span><span>RAG</span></div>
+      </article>
+      <article class="proj reveal" data-cursor>
+        <span class="pno">EDU</span>
+        <h3>B.E. Computer Engineering</h3>
+        <p>Kathmandu Engineering College · 2019 – 2024. The foundation under the infrastructure — systems, networks, and the habit of building things that hold up.</p>
+        <div class="stack"><span>Systems</span><span>Networks</span><span>2019–2024</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="eyebrow">// LET'S BUILD SOMETHING RELIABLE</div>
+    <h2>Got infrastructure that<br>should run itself?</h2>
+    <a href="mailto:an.uurraag@outlook.com" class="email" data-cursor>an.uurraag@outlook.com</a>
+    <div class="contact-meta">
+      <span>+977 9803532151</span>
+      <span>Kathmandu, Nepal</span>
+      <!-- TODO: add your real profile URLs below -->
+      <a href="https://www.linkedin.com/in/anuurraag/" data-cursor>LinkedIn ↗</a>
+      <a href="https://github.com/aneklavya" data-cursor>GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2026 Anurag Jha</span>
+    <span>uptime: 99.9% · built with care</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
