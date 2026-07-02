@@ -66,6 +66,57 @@
       new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.18 })
     );
     cube.add(cageA, cageB);
+
+    /* --- shiny orbit splines: faint glowing paths with bright comets riding them --- */
+    const splines = [];
+    function makeSpline(radius, tiltX, tiltZ, color, speed){
+      const pts = [];
+      for(let i = 0; i < 60; i++){
+        const a = i / 60 * Math.PI * 2;
+        const v = new THREE.Vector3(
+          Math.cos(a) * radius,
+          Math.sin(a) * radius * 0.55,
+          Math.sin(a * 2) * 0.5          // gentle figure-eight wobble
+        );
+        v.applyAxisAngle(new THREE.Vector3(1,0,0), tiltX);
+        v.applyAxisAngle(new THREE.Vector3(0,0,1), tiltZ);
+        pts.push(v);
+      }
+      const curve = new THREE.CatmullRomCurve3(pts, true);
+      const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(160));
+      const line = new THREE.LineLoop(geo, new THREE.LineBasicMaterial({
+        color, transparent:true, opacity:0.2,
+        blending:THREE.AdditiveBlending, depthWrite:false
+      }));
+      cube.add(line);
+      // comet head + fading trail
+      const trail = [];
+      for(let i = 0; i < 7; i++){
+        const s = new THREE.Mesh(
+          new THREE.SphereGeometry(0.055 * (1 - i * 0.11), 8, 8),
+          new THREE.MeshBasicMaterial({
+            color, transparent:true, opacity:0.9 * (1 - i * 0.13),
+            blending:THREE.AdditiveBlending, depthWrite:false
+          })
+        );
+        cube.add(s); trail.push(s);
+      }
+      splines.push({ curve, trail, speed, offset: Math.random() });
+    }
+    makeSpline(3.1,  0.5,  0.3, 0x6ee7ff, 0.050);
+    makeSpline(3.5, -0.9,  0.8, 0xa78bfa, 0.036);
+    makeSpline(2.8,  1.2, -0.5, 0xffd07a, 0.062);
+
+    function moveComets(t){
+      splines.forEach(sp=>{
+        const base = ((t * sp.speed + sp.offset) % 1 + 1) % 1;
+        sp.trail.forEach((m, i)=>{
+          const u = ((base - i * 0.013) % 1 + 1) % 1;
+          m.position.copy(sp.curve.getPointAt(u));
+        });
+      });
+    }
+
     scene.add(cube);
 
     /* --- glitter: three point clouds twinkling out of phase --- */
@@ -128,6 +179,7 @@
       cube.rotation.set(0.5, 0.7, 0.1);
       cageA.rotation.set(0.2, -0.4, 0.3);
       cageB.rotation.set(-0.3, 0.5, -0.2);
+      moveComets(0);
       renderer.render(scene, camera);
       return;
     }
@@ -151,6 +203,9 @@
       cageA.rotation.x = -t * 0.14; cageA.rotation.z = t * 0.1;
       cageB.rotation.y = -t * 0.1;  cageB.rotation.x = t * 0.07;
 
+      // comets sweeping along the orbit splines
+      moveComets(t);
+
       // orbiting gold light = moving specular highlight, the "shine"
       lGold.position.x = Math.sin(t * 0.6) * 7;
       lGold.position.z = Math.cos(t * 0.6) * 7;
@@ -171,6 +226,86 @@
       renderer.render(scene, camera);
     }
     frame();
+  })();
+
+  /* ============================================================
+     HONEYCOMB FIELD — right-side hex grid that shines near the cursor
+     ============================================================ */
+  (function honeycomb(){
+    const svg = document.getElementById('honeycomb');
+    if(!svg) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    const IDLE_STROKE = 'rgba(255,255,255,0.05)';
+    let cells = [];
+
+    function hexPoints(cx, cy, r){
+      let p = '';
+      for(let i = 0; i < 6; i++){
+        const a = Math.PI / 3 * i + Math.PI / 6;   // pointy-top
+        p += `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)} `;
+      }
+      return p.trim();
+    }
+
+    function build(){
+      svg.innerHTML = '';
+      cells = [];
+      const W = svg.clientWidth, H = svg.clientHeight;
+      if(!W || !H) return;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const r = 34, w = r * Math.sqrt(3), h = r * 1.5;
+      for(let row = 0; row * h < H + r; row++){
+        for(let col = 0; col * w < W + w; col++){
+          const cx = col * w + (row % 2 ? w / 2 : 0);
+          const cy = row * h;
+          const el = document.createElementNS(NS, 'polygon');
+          el.setAttribute('points', hexPoints(cx, cy, r - 2));
+          el.setAttribute('fill', 'none');
+          el.setAttribute('stroke', IDLE_STROKE);
+          svg.appendChild(el);
+          cells.push({ el, cx, cy, on:false });
+        }
+      }
+    }
+    build();
+    let rt;
+    window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(build, 150); });
+
+    // shine only makes sense with a real pointer
+    if(!fine || reduced) return;
+
+    let px = -9999, py = -9999, dirty = false;
+    window.addEventListener('mousemove', e=>{
+      const b = svg.getBoundingClientRect();
+      px = e.clientX - b.left;
+      py = e.clientY - b.top;
+      dirty = true;
+    }, { passive:true });
+    document.addEventListener('mouseleave', ()=>{ px = py = -9999; dirty = true; });
+
+    const R = 190;   // glow radius in px
+    function paint(){
+      requestAnimationFrame(paint);
+      if(!dirty) return;
+      dirty = false;
+      for(const c of cells){
+        const d = Math.hypot(c.cx - px, c.cy - py);
+        if(d > R){
+          if(c.on){
+            c.on = false;
+            c.el.setAttribute('stroke', IDLE_STROKE);
+            c.el.setAttribute('fill', 'none');
+          }
+          continue;
+        }
+        const k = 1 - d / R;
+        const e = k * k;                     // ease toward the cursor
+        c.on = true;
+        c.el.setAttribute('stroke', `rgba(110,231,255,${(0.08 + e * 0.85).toFixed(2)})`);
+        c.el.setAttribute('fill',   `rgba(110,231,255,${(e * 0.10).toFixed(3)})`);
+      }
+    }
+    paint();
   })();
 
   /* ---------- Glowing cursor ---------- */
