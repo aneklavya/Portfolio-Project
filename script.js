@@ -67,7 +67,20 @@
     );
     cube.add(cageA, cageB);
 
-    /* --- shiny orbit splines: faint glowing paths with bright comets riding them --- */
+    /* --- shiny orbit splines: glowing tube paths with bright comets riding them --- */
+    // soft radial glow texture for comet heads
+    function glowTexture(){
+      const c = document.createElement('canvas'); c.width = c.height = 64;
+      const g = c.getContext('2d');
+      const grad = g.createRadialGradient(32,32,0,32,32,32);
+      grad.addColorStop(0,   'rgba(255,255,255,1)');
+      grad.addColorStop(0.35,'rgba(255,255,255,0.5)');
+      grad.addColorStop(1,   'rgba(255,255,255,0)');
+      g.fillStyle = grad; g.fillRect(0,0,64,64);
+      return new THREE.CanvasTexture(c);
+    }
+    const glowTex = glowTexture();
+
     const splines = [];
     function makeSpline(radius, tiltX, tiltZ, color, speed){
       const pts = [];
@@ -83,29 +96,39 @@
         pts.push(v);
       }
       const curve = new THREE.CatmullRomCurve3(pts, true);
-      const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(160));
-      const line = new THREE.LineLoop(geo, new THREE.LineBasicMaterial({
-        color, transparent:true, opacity:0.2,
-        blending:THREE.AdditiveBlending, depthWrite:false
-      }));
-      cube.add(line);
+      // the path itself: a thin glowing tube (real thickness, unlike GPU lines)
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 140, 0.02, 6, true),
+        new THREE.MeshBasicMaterial({
+          color, transparent:true, opacity:0.45,
+          blending:THREE.AdditiveBlending, depthWrite:false
+        })
+      );
+      cube.add(tube);
       // comet head + fading trail
       const trail = [];
-      for(let i = 0; i < 7; i++){
+      for(let i = 0; i < 9; i++){
         const s = new THREE.Mesh(
-          new THREE.SphereGeometry(0.055 * (1 - i * 0.11), 8, 8),
+          new THREE.SphereGeometry(0.09 * (1 - i * 0.09), 8, 8),
           new THREE.MeshBasicMaterial({
-            color, transparent:true, opacity:0.9 * (1 - i * 0.13),
+            color, transparent:true, opacity:0.95 * (1 - i * 0.1),
             blending:THREE.AdditiveBlending, depthWrite:false
           })
         );
         cube.add(s); trail.push(s);
       }
-      splines.push({ curve, trail, speed, offset: Math.random() });
+      // halo sprite riding on the comet head
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map:glowTex, color, transparent:true, opacity:0.9,
+        blending:THREE.AdditiveBlending, depthWrite:false
+      }));
+      glow.scale.set(0.85, 0.85, 1);
+      cube.add(glow);
+      splines.push({ curve, trail, glow, speed, offset: Math.random() });
     }
-    makeSpline(3.1,  0.5,  0.3, 0x6ee7ff, 0.050);
-    makeSpline(3.5, -0.9,  0.8, 0xa78bfa, 0.036);
-    makeSpline(2.8,  1.2, -0.5, 0xffd07a, 0.062);
+    makeSpline(3.2,  0.5,  0.3, 0x6ee7ff, 0.050);
+    makeSpline(3.7, -0.9,  0.8, 0xa78bfa, 0.036);
+    makeSpline(2.9,  1.2, -0.5, 0xffd07a, 0.062);
 
     function moveComets(t){
       splines.forEach(sp=>{
@@ -114,6 +137,7 @@
           const u = ((base - i * 0.013) % 1 + 1) % 1;
           m.position.copy(sp.curve.getPointAt(u));
         });
+        sp.glow.position.copy(sp.trail[0].position);
       });
     }
 
@@ -157,9 +181,9 @@
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-      if(w < 700){ baseY = 1.2; cube.position.set(0, baseY, -2); cube.scale.setScalar(0.72); }
-      else if(w < 1100){ baseY = 0.3; cube.position.set(1.6, baseY, -1); cube.scale.setScalar(0.85); }
-      else { baseY = 0.2; cube.position.set(2.7, baseY, 0); cube.scale.setScalar(1); }
+      if(w < 700){ baseY = 1.4; cube.position.set(0, baseY, -2); cube.scale.setScalar(0.72); }
+      else if(w < 1100){ baseY = 1.0; cube.position.set(1.8, baseY, -1); cube.scale.setScalar(0.9); }
+      else { baseY = 1.1; cube.position.set(2.6, baseY, 0); cube.scale.setScalar(1.05); }
     }
     layout();
     let rzt;
@@ -235,7 +259,7 @@
     const svg = document.getElementById('honeycomb');
     if(!svg) return;
     const NS = 'http://www.w3.org/2000/svg';
-    const IDLE_STROKE = 'rgba(255,255,255,0.05)';
+    const IDLE_STROKE = 'rgba(150,200,255,0.11)';
     let cells = [];
 
     function hexPoints(cx, cy, r){
@@ -271,6 +295,25 @@
     let rt;
     window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(build, 150); });
 
+    // ambient twinkle — random cells flash softly so the field reads even without hover
+    if(!reduced){
+      setInterval(()=>{
+        if(document.hidden || !cells.length) return;
+        for(let n = 0; n < 2; n++){
+          const c = cells[Math.floor(Math.random() * cells.length)];
+          if(c.on) continue;
+          c.el.setAttribute('stroke', 'rgba(110,231,255,0.6)');
+          c.el.setAttribute('fill',   'rgba(110,231,255,0.07)');
+          setTimeout(()=>{
+            if(!c.on){
+              c.el.setAttribute('stroke', IDLE_STROKE);
+              c.el.setAttribute('fill', 'none');
+            }
+          }, 600);
+        }
+      }, 650);
+    }
+
     // shine only makes sense with a real pointer
     if(!fine || reduced) return;
 
@@ -283,7 +326,7 @@
     }, { passive:true });
     document.addEventListener('mouseleave', ()=>{ px = py = -9999; dirty = true; });
 
-    const R = 190;   // glow radius in px
+    const R = 240;   // glow radius in px
     function paint(){
       requestAnimationFrame(paint);
       if(!dirty) return;
@@ -301,8 +344,8 @@
         const k = 1 - d / R;
         const e = k * k;                     // ease toward the cursor
         c.on = true;
-        c.el.setAttribute('stroke', `rgba(110,231,255,${(0.08 + e * 0.85).toFixed(2)})`);
-        c.el.setAttribute('fill',   `rgba(110,231,255,${(e * 0.10).toFixed(3)})`);
+        c.el.setAttribute('stroke', `rgba(110,231,255,${(0.12 + e * 0.88).toFixed(2)})`);
+        c.el.setAttribute('fill',   `rgba(110,231,255,${(e * 0.14).toFixed(3)})`);
       }
     }
     paint();
