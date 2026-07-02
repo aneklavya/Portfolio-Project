@@ -39,6 +39,51 @@
   const nav=document.getElementById('nav');
   ScrollTrigger.create({ start:'top -20', onUpdate:self=>{ nav.classList.toggle('scrolled', self.scroll()>20); }});
 
+  /* ---------- Top scroll progress bar ---------- */
+  const progress=document.getElementById('scrollProgress');
+  if(progress){
+    const setProgress=()=>{
+      const h=document.documentElement;
+      const max=(h.scrollHeight - h.clientHeight) || 1;
+      progress.style.width=(Math.min(h.scrollTop/max,1)*100)+'%';
+    };
+    window.addEventListener('scroll',setProgress,{passive:true});
+    setProgress();
+  }
+
+  /* ---------- Animated count-up on the metric readout ---------- */
+  function countUp(el){
+    const to=parseFloat(el.dataset.to||'0');
+    if(reduced){ el.textContent=to; return; }
+    const dur=1400, t0=performance.now();
+    const tick=now=>{
+      const p=Math.min((now-t0)/dur,1);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*eased);
+      if(p<1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  const nums=document.querySelectorAll('.readout .num');
+  if(reduced){
+    nums.forEach(countUp);
+    document.querySelectorAll('.skill-card').forEach(c=>c.classList.add('lit'));
+    const tb=document.getElementById('termBody');
+    if(tb){
+      tb.innerHTML=[
+        ['pfx','$ terraform apply -auto-approve'],
+        ['ok','Apply complete. 14 added, 0 changed.'],
+        ['pfx','$ kubectl rollout status deploy/api'],
+        ['ok','deployment "api" successfully rolled out'],
+        ['dim','[aiops] anomaly score 0.12 — nominal'],
+        ['ok','[aiops] resolved in 8s. no page sent.'],
+      ].map(([c,t])=>`<span class="ln ${c}">${t.replace(/</g,'&lt;')}</span>`).join('');
+    }
+  } else {
+    ScrollTrigger.create({ trigger:'#readout', start:'top 85%', once:true,
+      onEnter:()=>nums.forEach(countUp) });
+  }
+
   /* ============================================================
      Site-wide scroll spline
      A smooth Catmull-Rom curve spanning the full document height.
@@ -178,12 +223,54 @@
     });
   }
 
-  /* ---------- Skill card cursor-follow glow ---------- */
+  /* ---------- Skill card cursor-follow glow + signal-bar reveal ---------- */
   document.querySelectorAll('.skill-card').forEach(card=>{
     card.addEventListener('mousemove',e=>{
       const r=card.getBoundingClientRect();
       card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
       card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
     });
+    ScrollTrigger.create({ trigger:card, start:'top 80%', once:true,
+      onEnter:()=>card.classList.add('lit') });
   });
+
+  /* ---------- Hero terminal: typed deploy log ---------- */
+  const termBody=document.getElementById('termBody');
+  if(termBody){
+    const lines=[
+      {t:'$ terraform apply -auto-approve', c:'pfx'},
+      {t:'  aws_vpc.main: creating...', c:'dim'},
+      {t:'  aws_ecs_service.api: 3 tasks healthy', c:'ok'},
+      {t:'Apply complete. 14 added, 0 changed.', c:'ok'},
+      {t:'$ kubectl rollout status deploy/api', c:'pfx'},
+      {t:'  deployment "api" successfully rolled out', c:'ok'},
+      {t:'[aiops] anomaly score 0.12 — nominal', c:'dim'},
+      {t:'[aiops] latency spike detected → auto-scaling', c:'warn'},
+      {t:'[aiops] resolved in 8s. no page sent.', c:'ok'},
+      {t:'$ _', c:'pfx'},
+    ];
+    const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const cursorEl='<span class="term-cursor"></span>';
+    let li=0, ci=0, started=false;
+    function render(){
+      let out='';
+      for(let i=0;i<li;i++) out+=`<span class="ln ${lines[i].c}">${esc(lines[i].t)}</span>`;
+      if(li<lines.length){
+        out+=`<span class="ln ${lines[li].c}">${esc(lines[li].t.slice(0,ci))}${cursorEl}</span>`;
+      }
+      termBody.innerHTML=out;
+    }
+    function type(){
+      if(li>=lines.length){
+        setTimeout(()=>{ li=0; ci=0; type(); }, 4200);   // loop
+        return;
+      }
+      const line=lines[li];
+      if(ci<line.t.length){ ci++; render(); setTimeout(type, 18+Math.random()*26); }
+      else { li++; ci=0; render(); setTimeout(type, line.c==='pfx'?420:260); }
+    }
+    function start(){ if(started) return; started=true; type(); }
+    ScrollTrigger.create({ trigger:'.hero', start:'top 80%', once:true, onEnter:start });
+    setTimeout(start, 1100);
+  }
 })();
