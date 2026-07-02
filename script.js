@@ -1,13 +1,177 @@
 /* ============================================================
-   Anurag Jha — portfolio interactions
+   Anurag Jha — portfolio interactions · glass edition
+   - Three.js background: shining iridescent cube + glitter field
    - glowing circular cursor
    - GSAP hero sequence + scroll reveals
    - experience pipeline lighting
-   - site-wide scroll spline (growing curve)
    ============================================================ */
 (function(){
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine    = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* ============================================================
+     3D SCENE — the signature piece.
+     A slowly tumbling metallic cube caged in two glowing
+     wireframe shells, drifting through a field of glitter.
+     ============================================================ */
+  (function scene3d(){
+    const canvas = document.getElementById('bg3d');
+    if(!canvas || typeof THREE === 'undefined') return;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 9);
+
+    /* --- lights: three colored points give the "shine" as the cube turns --- */
+    scene.add(new THREE.AmbientLight(0x1b2340, 1.1));
+    const lCyan   = new THREE.PointLight(0x6ee7ff, 1.6, 60); lCyan.position.set(6, 5, 7);
+    const lViolet = new THREE.PointLight(0xa78bfa, 1.4, 60); lViolet.position.set(-7, -4, 5);
+    const lGold   = new THREE.PointLight(0xffd07a, 0.8, 50); lGold.position.set(0, 7, -4);
+    scene.add(lCyan, lViolet, lGold);
+
+    /* --- cube group --- */
+    const cube = new THREE.Group();
+
+    const core = new THREE.Mesh(
+      new THREE.BoxGeometry(2.4, 2.4, 2.4),
+      new THREE.MeshStandardMaterial({
+        color: 0x131c38,
+        metalness: 0.9,
+        roughness: 0.16,
+        transparent: true,
+        opacity: 0.95
+      })
+    );
+    cube.add(core);
+
+    // inner glowing edges hugging the core
+    const edgeInner = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(2.46, 2.46, 2.46)),
+      new THREE.LineBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.85 })
+    );
+    cube.add(edgeInner);
+
+    // outer glass cage, cyan
+    const cageA = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(3.6, 3.6, 3.6)),
+      new THREE.LineBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.35 })
+    );
+    // second cage, violet, counter-rotating
+    const cageB = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(4.8, 4.8, 4.8)),
+      new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.18 })
+    );
+    cube.add(cageA, cageB);
+    scene.add(cube);
+
+    /* --- glitter: three point clouds twinkling out of phase --- */
+    function makeGlitter(count, color, size, rMin, rMax){
+      const pos = new Float32Array(count * 3);
+      for(let i = 0; i < count; i++){
+        // random point in a spherical shell so sparkles surround the scene
+        const r = rMin + Math.random() * (rMax - rMin);
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        pos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+        pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta) * 0.7; // squash vertically
+        pos[i*3+2] = r * Math.cos(phi) * 0.6 - 2;
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const mat = new THREE.PointsMaterial({
+        color, size,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const pts = new THREE.Points(geo, mat);
+      scene.add(pts);
+      return pts;
+    }
+    const isSmall  = window.innerWidth < 700;
+    const glitterA = makeGlitter(isSmall ? 140 : 260, 0xffffff, 0.05, 5, 16);
+    const glitterB = makeGlitter(isSmall ?  90 : 170, 0x6ee7ff, 0.06, 4, 14);
+    const glitterC = makeGlitter(isSmall ?  60 : 110, 0xffd07a, 0.05, 6, 15);
+
+    /* --- layout: keep the cube off to the side on wide screens --- */
+    let baseY = 0.2;
+    function layout(){
+      const w = window.innerWidth, h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      if(w < 700){ baseY = 1.2; cube.position.set(0, baseY, -2); cube.scale.setScalar(0.72); }
+      else if(w < 1100){ baseY = 0.3; cube.position.set(1.6, baseY, -1); cube.scale.setScalar(0.85); }
+      else { baseY = 0.2; cube.position.set(2.7, baseY, 0); cube.scale.setScalar(1); }
+    }
+    layout();
+    let rzt;
+    window.addEventListener('resize', ()=>{ clearTimeout(rzt); rzt = setTimeout(layout, 120); });
+
+    /* --- interaction state --- */
+    let mx = 0, my = 0;           // normalized mouse
+    if(fine){
+      window.addEventListener('mousemove', e=>{
+        mx = (e.clientX / window.innerWidth)  * 2 - 1;
+        my = (e.clientY / window.innerHeight) * 2 - 1;
+      }, { passive:true });
+    }
+
+    if(reduced){
+      // one calm static frame — no continuous motion
+      cube.rotation.set(0.5, 0.7, 0.1);
+      cageA.rotation.set(0.2, -0.4, 0.3);
+      cageB.rotation.set(-0.3, 0.5, -0.2);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    /* --- animation loop --- */
+    const clock = new THREE.Clock();
+    let paused = false;
+    document.addEventListener('visibilitychange', ()=>{ paused = document.hidden; });
+
+    function frame(){
+      requestAnimationFrame(frame);
+      if(paused) return;
+      const t = clock.getElapsedTime();
+      const scroll = window.scrollY || 0;
+
+      // continuous tumble + a touch of scroll-driven spin
+      cube.rotation.x = t * 0.22 + scroll * 0.0006;
+      cube.rotation.y = t * 0.3  + scroll * 0.0009;
+      cube.position.y += (baseY + Math.sin(t * 0.7) * 0.25 - cube.position.y) * 0.05;
+
+      cageA.rotation.x = -t * 0.14; cageA.rotation.z = t * 0.1;
+      cageB.rotation.y = -t * 0.1;  cageB.rotation.x = t * 0.07;
+
+      // orbiting gold light = moving specular highlight, the "shine"
+      lGold.position.x = Math.sin(t * 0.6) * 7;
+      lGold.position.z = Math.cos(t * 0.6) * 7;
+
+      // twinkle — clouds pulse out of phase and drift slowly
+      glitterA.material.opacity = 0.45 + 0.35 * Math.sin(t * 1.7);
+      glitterB.material.opacity = 0.4  + 0.4  * Math.sin(t * 2.3 + 2);
+      glitterC.material.opacity = 0.35 + 0.4  * Math.sin(t * 1.3 + 4);
+      glitterA.rotation.y = t * 0.015;
+      glitterB.rotation.y = -t * 0.02;
+      glitterC.rotation.x = t * 0.01;
+
+      // gentle camera parallax toward the mouse
+      camera.position.x += (mx * 0.6 - camera.position.x) * 0.04;
+      camera.position.y += (-my * 0.4 - camera.position.y) * 0.04;
+      camera.lookAt(0, 0, 0);
+
+      renderer.render(scene, camera);
+    }
+    frame();
+  })();
 
   /* ---------- Glowing cursor ---------- */
   if(fine && !reduced){
@@ -17,12 +181,16 @@
     const yRing = gsap.quickTo(ring,'y',{duration:.45,ease:'power3'});
     const xDot  = gsap.quickTo(dot,'x',{duration:.12,ease:'power3'});
     const yDot  = gsap.quickTo(dot,'y',{duration:.12,ease:'power3'});
-    let entered=false;
+    let hidden=true;
+    const show=()=>{ if(!hidden) return; hidden=false; ring.classList.remove('is-hidden'); dot.classList.remove('is-hidden'); };
+    const hide=()=>{ hidden=true; ring.classList.add('is-hidden'); dot.classList.add('is-hidden'); };
+    ring.classList.add('is-hidden'); dot.classList.add('is-hidden');
     window.addEventListener('mousemove',e=>{
-      if(!entered){ entered=true; ring.classList.remove('is-hidden'); dot.classList.remove('is-hidden'); }
+      show();
       xRing(e.clientX); yRing(e.clientY); xDot(e.clientX); yDot(e.clientY);
     });
-    document.addEventListener('mouseleave',()=>{ ring.classList.add('is-hidden'); dot.classList.add('is-hidden'); });
+    document.addEventListener('mouseenter',show);
+    document.addEventListener('mouseleave',hide);
     document.querySelectorAll('a, button, [data-cursor]').forEach(el=>{
       el.addEventListener('mouseenter',()=>ring.classList.add('is-active'));
       el.addEventListener('mouseleave',()=>ring.classList.remove('is-active'));
@@ -79,103 +247,11 @@
         ['ok','[aiops] resolved in 8s. no page sent.'],
       ].map(([c,t])=>`<span class="ln ${c}">${t.replace(/</g,'&lt;')}</span>`).join('');
     }
-  } else {
-    ScrollTrigger.create({ trigger:'#readout', start:'top 85%', once:true,
-      onEnter:()=>nums.forEach(countUp) });
+    return; // no motion beyond this point
   }
 
-  /* ============================================================
-     Site-wide scroll spline
-     A smooth Catmull-Rom curve spanning the full document height.
-     The drawn portion + glowing head track scroll progress.
-     ============================================================ */
-  const svg  = document.getElementById('scrollSpline');
-  const track= document.getElementById('splineTrack');
-  const draw = document.getElementById('splineDraw');
-  const head = document.getElementById('splineHead');
-  const halo = document.getElementById('splineHalo');
-  let drawLen = 0;
-
-  // Convert a set of points into a smooth path using Catmull-Rom -> cubic Bézier
-  function smoothPath(pts){
-    if(pts.length < 2) return '';
-    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-    for(let i=0; i<pts.length-1; i++){
-      const p0 = pts[i-1] || pts[i];
-      const p1 = pts[i];
-      const p2 = pts[i+1];
-      const p3 = pts[i+2] || p2;
-      const c1x = p1.x + (p2.x - p0.x)/6;
-      const c1y = p1.y + (p2.y - p0.y)/6;
-      const c2x = p2.x - (p3.x - p1.x)/6;
-      const c2y = p2.y - (p3.y - p1.y)/6;
-      d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-    return d;
-  }
-
-  function buildSpline(){
-    if(!svg || !track || !draw) return;
-    const W = svg.clientWidth || 80;
-    const H = Math.max(document.documentElement.scrollHeight, window.innerHeight);
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    svg.style.height = H + 'px';
-
-    const baseX = W * 0.45;          // resting x inside the gutter
-    const amp   = W * 0.32;          // sideways swing of the curve
-    const wave  = 460;               // vertical wavelength in px
-    const step  = 70;                // sampling resolution
-    const pts = [];
-    for(let y=0; y<=H; y+=step){
-      pts.push({ x: baseX + amp * Math.sin(y / wave * Math.PI * 2), y });
-    }
-    if(pts[pts.length-1].y < H) pts.push({ x: baseX + amp * Math.sin(H / wave * Math.PI * 2), y: H });
-
-    const d = smoothPath(pts);
-    track.setAttribute('d', d);
-    draw.setAttribute('d', d);
-
-    drawLen = draw.getTotalLength();
-    draw.style.strokeDasharray = drawLen;
-    draw.style.strokeDashoffset = reduced ? 0 : drawLen;
-
-    if(reduced){
-      const end = draw.getPointAtLength(drawLen);
-      placeHead(end);
-    }
-  }
-
-  function placeHead(pt){
-    if(head){ head.setAttribute('cx', pt.x); head.setAttribute('cy', pt.y); }
-    if(halo){ halo.setAttribute('cx', pt.x); halo.setAttribute('cy', pt.y); }
-  }
-
-  function updateSpline(progress){
-    if(!draw || !drawLen) return;
-    const p = Math.min(Math.max(progress, 0), 1);
-    draw.style.strokeDashoffset = drawLen * (1 - p);
-    const pt = draw.getPointAtLength(drawLen * p);
-    placeHead(pt);
-  }
-
-  if(svg){
-    buildSpline();
-    if(!reduced){
-      ScrollTrigger.create({
-        trigger: document.body,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.5,
-        onUpdate: self => updateSpline(self.progress)
-      });
-      // rebuild on resize / layout change so the curve always spans the page
-      let rt;
-      window.addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(()=>{ buildSpline(); ScrollTrigger.refresh(); }, 200); });
-      ScrollTrigger.addEventListener('refreshInit', buildSpline);
-    }
-  }
-
-  if(reduced) return;
+  ScrollTrigger.create({ trigger:'#readout', start:'top 85%', once:true,
+    onEnter:()=>nums.forEach(countUp) });
 
   /* ---------- Hero load sequence ---------- */
   const tl=gsap.timeline({defaults:{ease:'power3.out'}});
@@ -184,16 +260,10 @@
     .to('h1 .reveal-line > span',{yPercent:0,duration:1,ease:'power4.out'},'-=.3')
     .from('#tag',{opacity:0,y:20,duration:.8},'-=.55')
     .from('#sub',{opacity:0,y:20,duration:.8},'-=.6')
-    .from('#readout .cell',{opacity:0,y:24,duration:.6,stagger:.08},'-=.5')
+    .from('#heroCta .btn',{opacity:0,y:16,duration:.5,stagger:.08},'-=.5')
+    .from('.terminal',{opacity:0,y:30,duration:.9,clearProps:'transform,opacity'},'-=.7')
+    .from('#readout',{opacity:0,y:24,duration:.7},'-=.5')
     .from('nav .nav-inner',{opacity:0,y:-12,duration:.6},'-=.9');
-
-  /* telemetry line draw */
-  const tele=document.getElementById('telePath');
-  if(tele){
-    const len=tele.getTotalLength();
-    gsap.set(tele,{strokeDasharray:len,strokeDashoffset:len});
-    gsap.to(tele,{strokeDashoffset:0,duration:2.4,ease:'power2.inOut',delay:.4});
-  }
 
   /* ---------- Section heads ---------- */
   gsap.utils.toArray('.sec-head').forEach(headEl=>{
@@ -223,7 +293,7 @@
     });
   }
 
-  /* ---------- Skill card cursor-follow glow + signal-bar reveal ---------- */
+  /* ---------- Skill card cursor-follow glow + level-bar reveal ---------- */
   document.querySelectorAll('.skill-card').forEach(card=>{
     card.addEventListener('mousemove',e=>{
       const r=card.getBoundingClientRect();
