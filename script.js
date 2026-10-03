@@ -15,7 +15,7 @@ import { initCursor } from "./cursor.js";
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const finePointer  = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 /* ============================================================
    STAGE: renderer + environment + rim lights
@@ -62,7 +62,7 @@ function createStage(canvas, { fov = 30, z = 10, envIntensity = 1 } = {}) {
    introG (load-in) > floatG (idle bob + body sway) > model
    ============================================================ */
 const heroCanvas = document.getElementById("heroBot");
-const nowCanvas  = document.getElementById("nowBot");
+const nowCanvas = document.getElementById("nowBot");
 let hero = null, card = null;
 
 try {
@@ -149,12 +149,58 @@ if (hero) {
 /* ============================================================
    MOTION
    ============================================================ */
-const title = new SplitText("#heroTitle", { type: "chars", mask: "chars" });
+const title = new SplitText("#heroTitle", { type: "chars", charsClass: "hc", mask: "chars" });
 gsap.set([".hero-orbit", ".hero-halo"], { x: 0, y: 0, xPercent: -50, yPercent: -50 });
 gsap.set("#nowCard", { y: 0, yPercent: -30 });
 
 /* nav background after leaving the top (state, not motion, so it runs either way) */
 ScrollTrigger.create({ start: 40, end: "max", toggleClass: { targets: "#nav", className: "is-scrolled" } });
+
+/* hero name: a circular blue spotlight that lights the letter under the pointer */
+if (finePointer) {
+  const titleEl = document.getElementById("heroTitle");
+  let lit = null;
+  const light = (char, on) => {
+    if (on && lit === char) return;
+    if (lit) {
+      lit.parentElement.style.overflow = "clip";
+      gsap.to(lit, { color: "", textShadow: "none", duration: 0.35, ease: "expo.out", overwrite: "auto" });
+      const gl = lit._glow;
+      if (gl) gsap.to(gl, { opacity: 0, scale: 0.7, duration: 0.4, ease: "power2.in", overwrite: "auto" });
+    }
+    lit = on ? char : null;
+    if (on) {
+      char.parentElement.style.overflow = "visible";
+      if (!char._glow) {
+        const g = document.createElement("span");
+        g.className = "hero-glow";
+        char.parentElement.appendChild(g);
+        char._glow = g;
+      }
+      gsap.to(char, {
+        color: "#ffffff",
+        textShadow:
+          "0 0 6px #ffffff, " +
+          "0 0 14px #ffffff, " +
+          "0 0 28px rgba(255,255,255,.9), " +
+          "0 0 50px rgba(255,255,255,.6)",
+        duration: 0.18, ease: "power2.out", overwrite: "auto",
+      });
+      const gl = char._glow;
+      gsap.to(gl, {
+        opacity: 1, scale: 1, duration: 0.22, ease: "power2.out", overwrite: "auto",
+      });
+    }
+  };
+  titleEl.addEventListener("pointerover", (e) => {
+    const c = e.target.closest(".hc");
+    if (c) light(c, true);
+  });
+  titleEl.addEventListener("pointerout", (e) => {
+    const c = e.target.closest(".hc");
+    if (c && !c.contains(e.relatedTarget)) light(c, false);
+  });
+}
 
 if (reduceMotion) {
   // static, fully composed frame. No loops, no scrub, no pan.
@@ -194,6 +240,23 @@ function initMotion() {
     .from("#nowCard", { x: 60, opacity: 0, duration: 1.1, ease: "expo.out" }, 1.1)
     .add(startIdle);
 
+  /* ---------- hero name: the letter under the pointer lights up blue ---------- */
+  if (finePointer) {
+    const base = getComputedStyle(title.chars[0]).color;
+    const lit = { textShadow: "0 0 24px rgba(90,150,255,.85), 0 0 60px rgba(60,120,255,.45)", color: "#bcd8ff" };
+    const off = { textShadow: "0 0 0 rgba(90,150,255,0)", color: base };
+    const paint = (over) => title.chars.forEach((c) => {
+      const on = c === over;
+      gsap.to(c, { ...(on ? lit : off), duration: on ? 0.45 : 0.7, ease: "expo.out", overwrite: "auto" });
+    });
+    const host = document.querySelector("#heroTitle");
+    host.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      paint(e.target.closest(".char"));
+    });
+    host.addEventListener("pointerleave", () => paint(null));
+  }
+
   /* ---------- idle life, started once the bot has landed ---------- */
   function startIdle() {
     gsap.to(".hero-orbit", { rotate: "+=360", duration: 140, repeat: -1, ease: "none" });
@@ -209,8 +272,18 @@ function initMotion() {
       .to(bot.eyeMat, { opacity: 0.12, duration: 0.07, ease: "none" }, "+=0.12")
       .to(bot.eyeMat, { opacity: 1, duration: 0.18, ease: "none" });
 
-    // ear vents turn slowly, like a cooling fan idling
-    gsap.to(bot.spinners.map((v) => v.rotation), { x: "+=" + Math.PI * 2, duration: 14, repeat: -1, ease: "none" });
+    // ear vents spin fast, like a cooling fan at full speed
+    gsap.to(bot.spinners.map((v) => v.rotation), { x: "+=" + Math.PI * 2, duration: 1.75, repeat: -1, ease: "none" });
+
+    // whole-bot glow shell breathes with white light, always on
+    gsap.to(bot.glowShell.material, { opacity: 0.32, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+    const gs = bot.glowShell.scale;
+    gsap.to(gs, { x: 1.1, y: 1.1, z: 1.1, duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+    // ear rings are always lit: a slow breathing pulse of brightness + halo bloom
+    gsap.to(bot.earRings, {
+      opacity: 0.55, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut", overwrite: "auto",
+    });
 
     // ear lights chase in sequence
     gsap.to(bot.ledMats, { opacity: 0.15, duration: 0.7, ease: "sine.inOut", stagger: { each: 0.12, repeat: -1, yoyo: true } });
@@ -241,12 +314,12 @@ function initMotion() {
     scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1 },
   });
   exit.to("#heroTitle", { yPercent: -70, opacity: 0, ease: "none" }, 0)
-      .to(".hero-orbit", { scale: 1.25, opacity: 0, ease: "none" }, 0)
-      .to(".hero-copy", { y: -60, opacity: 0, ease: "none" }, 0)
-      .to("#nowCard", { x: 80, opacity: 0, ease: "none" }, 0);
+    .to(".hero-orbit", { scale: 1.25, opacity: 0, ease: "none" }, 0)
+    .to(".hero-copy", { y: -60, opacity: 0, ease: "none" }, 0)
+    .to("#nowCard", { x: 80, opacity: 0, ease: "none" }, 0);
   if (hero) {
     exit.to(hero.scrollG.rotation, { y: 0.75, ease: "none" }, 0)
-        .to(hero.scrollG.position, { y: -1.4, ease: "none" }, 0);
+      .to(hero.scrollG.position, { y: -1.4, ease: "none" }, 0);
   }
 
   /* ---------- marquee: one seamless loop ---------- */
@@ -271,8 +344,10 @@ function initMotion() {
     trigger: "#metrics", start: "top 85%", once: true,
     onEnter: () => document.querySelectorAll(".metric .num").forEach((el, i) => {
       const o = { v: 0 };
-      gsap.to(o, { v: +el.dataset.to, duration: 1.6, delay: i * 0.1, ease: "power3.out", snap: { v: 1 },
-        onUpdate: () => (el.textContent = o.v) });
+      gsap.to(o, {
+        v: +el.dataset.to, duration: 1.6, delay: i * 0.1, ease: "power3.out", snap: { v: 1 },
+        onUpdate: () => (el.textContent = o.v)
+      });
     }),
   });
 

@@ -22,7 +22,7 @@ const smooth = (a, b, x) => {
 function skull(p) {
   const lower = smooth(0.1, -0.9, p.y);
   const front = smooth(-0.2, 0.9, p.z);
-  const back  = smooth(0.1, -0.9, p.z);
+  const back = smooth(0.1, -0.9, p.z);
   let x = p.x * 0.8;
   let y = p.y;
   let z = p.z * 1.05;
@@ -98,6 +98,19 @@ export function buildRobot(mats) {
   const model = new THREE.Group();
   const ledMats = [];
   const spinners = [];
+  const earRings = [];
+
+  /* ---- whole-bot soft white glow shell (always on) ---- */
+  const glowShellMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0.18,
+    blending: THREE.AdditiveBlending, side: THREE.BackSide,
+    depthWrite: false, toneMapped: false,
+  });
+  const glowShell = new THREE.Mesh(
+    new THREE.SphereGeometry(1.7, 48, 48), glowShellMat
+  );
+  glowShell.position.set(0, 0.35, 0); /* roughly centred on the bot's mass */
+  model.add(glowShell);
 
   /* ================= TORSO ================= */
   const torso = new THREE.Group();
@@ -137,6 +150,7 @@ export function buildRobot(mats) {
   ledMats.push(chestLightMat);
 
   /* ---- shoulders: joint ball under two stacked pauldron plates ---- */
+  // Ear part as circular disc
   for (const side of [-1, 1]) {
     const sh = new THREE.Group();
     sh.position.set(side * 1.52, -0.02, -0.02);
@@ -219,9 +233,9 @@ export function buildRobot(mats) {
   head.position.y = 0.95;
   headPivot.add(head);
 
-  const capEnd  = PI * 0.4;                 // crown plate ends here (theta)
-  const faceA   = capEnd + 0.07;            // visor slit sits in this gap
-  const faceW   = 0.98;                     // half-width of the face mask (phi)
+  const capEnd = PI * 0.4;                 // crown plate ends here (theta)
+  const faceA = capEnd + 0.07;            // visor slit sits in this gap
+  const faceW = 0.98;                     // half-width of the face mask (phi)
 
   head.add(new THREE.Mesh(patch(skull, 0.972, 0, PI * 2, 0, PI), core));
   // crown
@@ -305,11 +319,20 @@ export function buildRobot(mats) {
     }
     ear.add(vents);
     spinners.push(vents);
-    // centre hub with a light ring
+    // centre hub: a sharp inner ring that stays fully lit...
     ear.add(disc(0.13, 0.15, 0.08, visor, 0.11, 40));
     const hubMat = glow();
-    ear.add(ring(0.1, 0.01, hubMat, 0.152));
-    ledMats.push(hubMat);
+    const hubRing = ring(0.1, 0.01, hubMat, 0.152);
+    ear.add(hubRing);
+    earRings.push(hubRing);
+
+    // ...plus a soft halo that lets the light bleed far past the disc
+    const haloMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, toneMapped: false, depthWrite: false });
+    const haloRing = ring(0.18, 0.045, haloMat, 0.152);
+    ear.add(haloRing);
+    const haloOuter = ring(0.23, 0.022, new THREE.MeshBasicMaterial({ color: 0x8bc3ff, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, toneMapped: false, depthWrite: false }), 0.152);
+    ear.add(haloOuter);
+    earRings.push(haloRing, haloOuter);
     // antenna stub on the upper back edge
     const ant = cylinderBetween(new THREE.Vector3(side * 0.04, 0.3, -0.18), new THREE.Vector3(side * 0.06, 0.62, -0.42), 0.022, trim, 12);
     ear.add(ant);
@@ -329,26 +352,26 @@ export function buildRobot(mats) {
     }
   }
 
-  return { model, headPivot, eyeMat, ledMats, spinners };
+  return { model, headPivot, eyeMat, ledMats, spinners, earRings, glowShell };
 }
 
 /* ---------- material palettes ---------- */
 export function blackPalette() {
   return {
-    shell:  new THREE.MeshPhysicalMaterial({ color: 0x060607, metalness: 0.35, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.04 }),
-    core:   new THREE.MeshStandardMaterial({ color: 0x0b0b0c, metalness: 0.6, roughness: 0.55 }),
-    trim:   new THREE.MeshStandardMaterial({ color: 0xa6a6ac, metalness: 1, roughness: 0.24 }),
+    shell: new THREE.MeshPhysicalMaterial({ color: 0x060607, metalness: 0.35, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.04 }),
+    core: new THREE.MeshStandardMaterial({ color: 0x0b0b0c, metalness: 0.6, roughness: 0.55 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xa6a6ac, metalness: 1, roughness: 0.24 }),
     rubber: new THREE.MeshStandardMaterial({ color: 0x0d0d0e, metalness: 0.1, roughness: 0.6 }),
-    visor:  new THREE.MeshPhysicalMaterial({ color: 0x020203, metalness: 0.9, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02 }),
+    visor: new THREE.MeshPhysicalMaterial({ color: 0x020203, metalness: 0.9, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02 }),
   };
 }
 
 export function chromePalette() {
   return {
-    shell:  new THREE.MeshStandardMaterial({ color: 0xd6d7dc, metalness: 1, roughness: 0.15 }),
-    core:   new THREE.MeshStandardMaterial({ color: 0x2a2018, metalness: 0.8, roughness: 0.45 }),
-    trim:   new THREE.MeshStandardMaterial({ color: 0xc27a45, metalness: 1, roughness: 0.28 }),
+    shell: new THREE.MeshStandardMaterial({ color: 0xd6d7dc, metalness: 1, roughness: 0.15 }),
+    core: new THREE.MeshStandardMaterial({ color: 0x2a2018, metalness: 0.8, roughness: 0.45 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xc27a45, metalness: 1, roughness: 0.28 }),
     rubber: new THREE.MeshStandardMaterial({ color: 0x1a1a1c, metalness: 0.2, roughness: 0.5 }),
-    visor:  new THREE.MeshPhysicalMaterial({ color: 0x08080a, metalness: 0.9, roughness: 0.05, clearcoat: 1 }),
+    visor: new THREE.MeshPhysicalMaterial({ color: 0x08080a, metalness: 0.9, roughness: 0.05, clearcoat: 1 }),
   };
 }

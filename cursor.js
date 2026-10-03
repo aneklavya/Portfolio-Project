@@ -23,14 +23,14 @@ export function initCursor({ onMove } = {}) {
   const glow = make("cursor-glow");
   const dust = make("cursor-dust", "canvas");
   const ring = make("cursor-ring");
-  const dot  = make("cursor-dot");
+  const dot = make("cursor-dot");
   document.documentElement.classList.add("has-cursor");
 
   const centre = { xPercent: -50, yPercent: -50 };
   gsap.set([glow, ring, dot], { ...centre, x: -200, y: -200 });
 
-  const dotX  = gsap.quickTo(dot,  "x", { duration: 0.08, ease: "power3" });
-  const dotY  = gsap.quickTo(dot,  "y", { duration: 0.08, ease: "power3" });
+  const dotX = gsap.quickTo(dot, "x", { duration: 0.08, ease: "power3" });
+  const dotY = gsap.quickTo(dot, "y", { duration: 0.08, ease: "power3" });
   const ringX = gsap.quickTo(ring, "x", { duration: 0.42, ease: "power3" });
   const ringY = gsap.quickTo(ring, "y", { duration: 0.42, ease: "power3" });
   const glowX = gsap.quickTo(glow, "x", { duration: 1.4, ease: "power2" });
@@ -101,18 +101,42 @@ export function initCursor({ onMove } = {}) {
 
   /* ---------- hover states ---------- */
   const interactive = "a, button, [role='button'], .cell, .proj";
+  const chrome = ".nav, .foot";          // chrome sits behind the text, so the ring must not blur it
+  const ringRest = { scale: 1, backgroundColor: "rgba(242,242,240,0)", borderColor: "rgba(242,242,240,0.35)" };
+  const clearText = (on) => {
+    gsap.to(ring, {
+      "--ring-blur": on ? 0 : 1.5,
+      "--ring-glare": on ? "0 0 22px rgba(255,255,255,.22)" : "0 0 0 rgba(255,255,255,0)",
+      borderColor: on ? "rgba(242,242,240,.85)" : ringRest.borderColor,
+      backgroundColor: on ? "rgba(255,255,255,.05)" : ringRest.backgroundColor,
+      duration: 0.4, ease: "expo.out", overwrite: "auto",
+    });
+    gsap.to(glow, {
+      "--glow-core": on ? 0.15 : 0.075,
+      "--glow-mid": on ? 0.06 : 0.025,
+      duration: 0.5, ease: "expo.out", overwrite: "auto",
+    });
+  };
   document.addEventListener("pointerover", (e) => {
     const t = e.target.closest(interactive);
     if (!t) return;
     const big = t.matches(".cell, .proj");
-    gsap.to(ring, { scale: big ? 1.6 : 2.1, backgroundColor: "rgba(242,242,240,0.08)", borderColor: "rgba(242,242,240,0.6)", duration: 0.4, ease: "expo.out" });
-    gsap.to(dot, { scale: big ? 1 : 0.4, duration: 0.3 });
+    const inChrome = !!t.closest(chrome);
+    gsap.to(ring, {
+      scale: inChrome ? 1.6 : big ? 1.6 : 2.1,
+      backgroundColor: inChrome ? "rgba(255,255,255,.05)" : "rgba(242,242,240,0.08)",
+      borderColor: inChrome ? "rgba(242,242,240,.85)" : "rgba(242,242,240,0.6)",
+      duration: 0.4, ease: "expo.out", overwrite: "auto",
+    });
+    gsap.to(dot, { scale: inChrome ? 0.5 : big ? 1 : 0.4, duration: 0.3 });
+    clearText(inChrome);
   });
   document.addEventListener("pointerout", (e) => {
     const t = e.target.closest(interactive);
     if (!t || t.contains(e.relatedTarget)) return;
-    gsap.to(ring, { scale: 1, backgroundColor: "rgba(242,242,240,0)", borderColor: "rgba(242,242,240,0.35)", duration: 0.5, ease: "expo.out" });
+    gsap.to(ring, { ...ringRest, duration: 0.5, ease: "expo.out", overwrite: "auto" });
     gsap.to(dot, { scale: 1, duration: 0.3 });
+    clearText(false);
   });
 
   /* ---------- click ripple ---------- */

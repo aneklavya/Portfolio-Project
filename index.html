@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#08080a">
-<title>Anurag Jha | DevOps & AIOps Engineer</title>
-<meta name="description" content="Anurag Jha, DevOps and AIOps engineer building cloud infrastructure that deploys, monitors, and heals itself.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08080a">
+  <title>Anurag Jha | DevOps & AIOps Engineer</title>
+  <meta name="description"
+    content="Anurag Jha, DevOps and AIOps engineer building cloud infrastructure that deploys, monitors, and heals itself.">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-<link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
 
-<!-- Bare-specifier imports resolve to the CDN, so script.js reads like a bundled
+  <!-- Bare-specifier imports resolve to the CDN, so script.js reads like a bundled
      `import { gsap } from "gsap"` file. GSAP is pinned to the npm-installed 3.15.0. -->
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.15.0/index.js",
@@ -26,220 +31,295 @@
 }
 </script>
 </head>
+
 <body>
 
-<div class="grain" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-<nav class="nav" id="nav">
-  <a href="#top" class="logo" aria-label="Anurag Jha, home">
-    <span class="logo-mark">AJ</span>
-  </a>
-  <div class="nav-links">
-    <a href="#about">About</a>
-    <a href="#stack">Stack</a>
-    <a href="#work">Experience</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
-  </div>
-  <a href="https://drive.google.com/file/d/1rtUgk07OgYxc_9o1_SP-j_1RU_Bh7XR9/view?usp=sharing" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Download CV</a>
-</nav>
-
-<!-- ============ HERO ============ -->
-<header class="hero" id="top">
-  <div class="hero-grid" aria-hidden="true"></div>
-  <div class="hero-halo" aria-hidden="true"></div>
-
-  <h1 class="hero-title" id="heroTitle">ANURAG JHA</h1>
-
-  <svg class="hero-orbit" viewBox="0 0 1000 1000" aria-hidden="true">
-    <circle cx="500" cy="500" r="480" />
-  </svg>
-
-  <canvas class="hero-bot" id="heroBot" aria-label="Animated 3D robot rendering" role="img"></canvas>
-
-  <div class="hero-copy">
-    <p id="heroSub">DevOps and AIOps engineer. I build AWS infrastructure that deploys itself, watches itself, and recovers before anyone files a ticket.</p>
-    <a href="#projects" class="btn btn-solid" id="heroCta">See the builds <i class="ph ph-arrow-down-right"></i></a>
-  </div>
-
-  <aside class="now-card glass" id="nowCard">
-    <canvas class="now-bot" id="nowBot" aria-hidden="true"></canvas>
-    <div class="now-body">
-      <h2>COPILOTHQ</h2>
-      <p>Currently deploying AI agents, n8n pipelines and Terraform-managed AWS for AI4Group.</p>
-      <a href="#work" class="btn btn-solid btn-xs">Experience</a>
+  <nav class="nav" id="nav">
+    <a href="#top" class="logo" aria-label="Anurag Jha, home">
+      <span class="logo-mark">AJ</span>
+    </a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#stack">Stack</a>
+      <a href="#work">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
     </div>
-  </aside>
-</header>
+    <a href="https://drive.google.com/file/d/1rtUgk07OgYxc_9o1_SP-j_1RU_Bh7XR9/view?usp=sharing"
+      class="btn btn-outline btn-sm" target="_blank" rel="noopener">Download CV</a>
+  </nav>
 
-<!-- ============ STACK MARQUEE ============ -->
-<div class="marquee" aria-label="Tools I work with">
-  <div class="marquee-track" id="marquee">
-    <span>AWS</span><span>Terraform</span><span>Docker</span><span>Kubernetes</span><span>GitHub Actions</span><span>Prometheus</span><span>Grafana</span><span>CloudWatch</span><span>Python</span><span>n8n</span><span>RAG</span><span>MCP</span>
-  </div>
-</div>
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="top">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-halo" aria-hidden="true"></div>
 
-<!-- ============ ABOUT ============ -->
-<section class="sec about" id="about">
-  <div class="wrap about-grid">
-    <p class="about-lead" id="aboutLead">I treat infrastructure as a product. Reliable AWS environments, CI/CD that makes deploys boring on purpose, and AI in the operations layer so systems can flag and fix their own incidents.</p>
+    <h1 class="hero-title" id="heroTitle">ANURAG JHA</h1>
 
-    <dl class="facts">
-      <div><dt>Based in</dt><dd>Kathmandu, Nepal</dd></div>
-      <div><dt>Focus</dt><dd>DevOps, AIOps, MLOps</dd></div>
-      <div><dt>Cloud</dt><dd>AWS</dd></div>
-      <div><dt>Education</dt><dd>B.E. Computer Engineering, KEC 2019-2024</dd></div>
-      <div><dt>Status</dt><dd>Open to work</dd></div>
-    </dl>
-  </div>
+    <svg class="hero-orbit" viewBox="0 0 1000 1000" aria-hidden="true">
+      <circle cx="500" cy="500" r="480" />
+    </svg>
 
-  <div class="wrap">
-    <div class="metrics" id="metrics">
-      <div class="metric"><span class="metric-val"><span class="num" data-to="40">0</span>%</span><span class="metric-lbl">higher deployment reliability</span></div>
-      <div class="metric"><span class="metric-val"><span class="num" data-to="60">0</span>%</span><span class="metric-lbl">less manual deploy effort</span></div>
-      <div class="metric"><span class="metric-val"><span class="num" data-to="50">0</span>%</span><span class="metric-lbl">faster incident detection</span></div>
-      <div class="metric"><span class="metric-val"><span class="num" data-to="30">0</span>%</span><span class="metric-lbl">faster page loads</span></div>
-    </div>
-  </div>
-</section>
+    <canvas class="hero-bot" id="heroBot" aria-label="Animated 3D robot rendering" role="img"></canvas>
 
-<!-- ============ STACK BENTO ============ -->
-<section class="sec" id="stack">
-  <div class="wrap">
-    <h2 class="sec-title">The stack</h2>
-    <div class="bento" id="bento">
-      <article class="cell cell-cloud cell-glow">
-        <i class="ph ph-cloud"></i>
-        <h3>Cloud infrastructure</h3>
-        <p>Multi-tier AWS networks with least-privilege IAM and private data layers.</p>
-        <ul class="tags"><li>EC2</li><li>VPC</li><li>RDS</li><li>S3</li><li>IAM</li><li>CloudFront</li></ul>
-      </article>
-      <article class="cell cell-iac">
-        <i class="ph ph-stack"></i>
-        <h3>DevOps & IaC</h3>
-        <ul class="tags"><li>Terraform</li><li>Docker</li><li>Kubernetes</li><li>GitHub Actions</li></ul>
-      </article>
-      <article class="cell cell-obs cell-lines">
-        <i class="ph ph-pulse"></i>
-        <h3>Monitoring</h3>
-        <ul class="tags"><li>Prometheus</li><li>Grafana</li><li>CloudWatch</li><li>GuardDuty</li></ul>
-      </article>
-      <article class="cell cell-aiops cell-light">
-        <i class="ph ph-cpu"></i>
-        <h3>AIOps</h3>
-        <p>Anomaly detection and MCP agents that resolve common incidents on their own.</p>
-      </article>
-      <article class="cell cell-ai">
-        <i class="ph ph-graph"></i>
-        <h3>AI / ML</h3>
-        <ul class="tags"><li>LLMs</li><li>RAG</li><li>Vector DB</li><li>LoRA / QLoRA</li></ul>
-      </article>
-      <article class="cell cell-code">
-        <i class="ph ph-terminal-window"></i>
-        <h3>Languages & automation</h3>
-        <ul class="tags"><li>Python</li><li>Bash</li><li>C++</li><li>n8n</li><li>Zapier</li></ul>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ============ EXPERIENCE ============ -->
-<section class="sec" id="work">
-  <div class="wrap work-grid">
-    <div class="work-side">
-      <h2 class="sec-title">Experience</h2>
-      <div class="work-track" aria-hidden="true"><span class="work-fill" id="workFill"></span></div>
+    <div class="hero-copy">
+      <p id="heroSub">DevOps and AIOps engineer. I build AWS infrastructure that deploys itself, watches itself, and
+        recovers before anyone files a ticket.</p>
+      <a href="#projects" class="btn btn-solid" id="heroCta">See the builds <i class="ph ph-arrow-down-right"></i></a>
     </div>
 
-    <ol class="roles">
-      <li class="role">
-        <div class="role-meta"><span>May 2026 - Present</span><span>CopilotHQ (AI4Group), Remote</span></div>
-        <h3>Deployment & AI Engineer</h3>
-        <ul>
-          <li>Maintain and extend the n8n pipelines behind production workflows, with CI/CD backups that keep every workflow versioned.</li>
-          <li>Deploy containerised microservices on Dokploy and design AI agents for internal and customer-facing automation.</li>
-          <li>Provision AWS with Terraform and build out MLOps tooling for the model lifecycle.</li>
+    <aside class="now-card glass" id="nowCard">
+      <canvas class="now-bot" id="nowBot" aria-hidden="true"></canvas>
+      <div class="now-body">
+        <h2>COPILOTHQ</h2>
+        <p>Currently deploying AI agents, n8n pipelines and Terraform-managed AWS for AI4Group.</p>
+        <a href="#work" class="btn btn-solid btn-xs">Experience</a>
+      </div>
+    </aside>
+  </header>
+
+  <!-- ============ STACK MARQUEE ============ -->
+  <div class="marquee" aria-label="Tools I work with">
+    <div class="marquee-track" id="marquee">
+      <span>AWS</span><span>Terraform</span><span>Docker</span><span>Kubernetes</span><span>GitHub
+        Actions</span><span>Prometheus</span><span>Grafana</span><span>CloudWatch</span><span>Python</span><span>n8n</span><span>RAG</span><span>MCP</span>
+    </div>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="sec about" id="about">
+    <div class="wrap about-grid">
+      <p class="about-lead" id="aboutLead">I treat infrastructure as a product. Reliable AWS environments, CI/CD that
+        makes deploys boring on purpose, and AI in the operations layer so systems can flag and fix their own incidents.
+      </p>
+
+      <dl class="facts">
+        <div>
+          <dt>Based in</dt>
+          <dd>Kathmandu, Nepal</dd>
+        </div>
+        <div>
+          <dt>Focus</dt>
+          <dd>DevOps, AIOps, MLOps</dd>
+        </div>
+        <div>
+          <dt>Cloud</dt>
+          <dd>AWS</dd>
+        </div>
+        <div>
+          <dt>Education</dt>
+          <dd>B.E. Computer Engineering, KEC 2019-2024</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>Open to work</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="wrap">
+      <div class="metrics" id="metrics">
+        <div class="metric"><span class="metric-val"><span class="num" data-to="40">0</span>%</span><span
+            class="metric-lbl">higher deployment reliability</span></div>
+        <div class="metric"><span class="metric-val"><span class="num" data-to="60">0</span>%</span><span
+            class="metric-lbl">less manual deploy effort</span></div>
+        <div class="metric"><span class="metric-val"><span class="num" data-to="50">0</span>%</span><span
+            class="metric-lbl">faster incident detection</span></div>
+        <div class="metric"><span class="metric-val"><span class="num" data-to="30">0</span>%</span><span
+            class="metric-lbl">faster page loads</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STACK BENTO ============ -->
+  <section class="sec" id="stack">
+    <div class="wrap">
+      <h2 class="sec-title">The stack</h2>
+      <div class="bento" id="bento">
+        <article class="cell cell-cloud cell-glow">
+          <i class="ph ph-cloud"></i>
+          <h3>Cloud infrastructure</h3>
+          <p>Multi-tier AWS networks with least-privilege IAM and private data layers.</p>
+          <ul class="tags">
+            <li>EC2</li>
+            <li>VPC</li>
+            <li>RDS</li>
+            <li>S3</li>
+            <li>IAM</li>
+            <li>CloudFront</li>
+          </ul>
+        </article>
+        <article class="cell cell-iac">
+          <i class="ph ph-stack"></i>
+          <h3>DevOps & IaC</h3>
+          <ul class="tags">
+            <li>Terraform</li>
+            <li>Docker</li>
+            <li>Kubernetes</li>
+            <li>GitHub Actions</li>
+          </ul>
+        </article>
+        <article class="cell cell-obs cell-lines">
+          <i class="ph ph-pulse"></i>
+          <h3>Monitoring</h3>
+          <ul class="tags">
+            <li>Prometheus</li>
+            <li>Grafana</li>
+            <li>CloudWatch</li>
+            <li>GuardDuty</li>
+          </ul>
+        </article>
+        <article class="cell cell-aiops cell-light">
+          <i class="ph ph-cpu"></i>
+          <h3>AIOps</h3>
+          <p>Anomaly detection and MCP agents that resolve common incidents on their own.</p>
+        </article>
+        <article class="cell cell-ai">
+          <i class="ph ph-graph"></i>
+          <h3>AI / ML</h3>
+          <ul class="tags">
+            <li>LLMs</li>
+            <li>RAG</li>
+            <li>Vector DB</li>
+            <li>LoRA / QLoRA</li>
+          </ul>
+        </article>
+        <article class="cell cell-code">
+          <i class="ph ph-terminal-window"></i>
+          <h3>Languages & automation</h3>
+          <ul class="tags">
+            <li>Python</li>
+            <li>Bash</li>
+            <li>C++</li>
+            <li>n8n</li>
+            <li>Zapier</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section class="sec" id="work">
+    <div class="wrap work-grid">
+      <div class="work-side">
+        <h2 class="sec-title">Experience</h2>
+        <div class="work-track" aria-hidden="true"><span class="work-fill" id="workFill"></span></div>
+      </div>
+
+      <ol class="roles">
+        <li class="role">
+          <div class="role-meta"><span>May 2026 - Present</span><span>CopilotHQ (AI4Group), Remote</span></div>
+          <h3>Deployment & AI Engineer</h3>
+          <ul>
+            <li>Maintain and extend the n8n pipelines behind production workflows, with CI/CD backups that keep every
+              workflow versioned.</li>
+            <li>Deploy containerised microservices on Dokploy and design AI agents for internal and customer-facing
+              automation.</li>
+            <li>Provision AWS with Terraform and build out MLOps tooling for the model lifecycle.</li>
+          </ul>
+        </li>
+        <li class="role">
+          <div class="role-meta"><span>Jun - Aug 2025</span><span>Leapfrog Technology</span></div>
+          <h3>DevOps & SecOps Fellow</h3>
+          <ul>
+            <li>Architected secure multi-tier AWS infrastructure, lifting deployment reliability by 40%.</li>
+            <li>Built GitHub Actions CI/CD that cut manual deployment effort by 60%.</li>
+            <li>Stood up CloudWatch, GuardDuty and WAF observability, halving incident detection time.</li>
+          </ul>
+        </li>
+        <li class="role">
+          <div class="role-meta"><span>May - Nov 2025</span><span>Yes Digital Pty. Ltd., Remote</span></div>
+          <h3>Technical SEO Specialist</h3>
+          <ul>
+            <li>Built programmatic SEO pipelines that generated landing pages at scale.</li>
+            <li>Improved Core Web Vitals for up to 30% faster load times.</li>
+            <li>Automated reporting in Python across GA4, GSC and GTM.</li>
+          </ul>
+        </li>
+        <li class="role">
+          <div class="role-meta"><span>Feb - Apr 2025</span><span>HCLTech</span></div>
+          <h3>AI/ML Intern, Deployment</h3>
+          <ul>
+            <li>Dockerised and deployed ML models to Linux for reproducible inference.</li>
+            <li>Improved model accuracy by 12% with Optuna tuning and SHAP explainability.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS (horizontal pan on desktop) ============ -->
+  <section class="projects" id="projects">
+    <div class="proj-track" id="projTrack">
+      <div class="proj-intro">
+        <h2 class="sec-title">Selected builds</h2>
+        <p>Three systems where automation and AI do the on-call work.</p>
+      </div>
+      <article class="proj">
+        <i class="ph ph-heartbeat proj-ico"></i>
+        <h3>Health Insights AI Agent</h3>
+        <p>An LLM-driven monitoring agent with automated data pipelines that turn raw health data into real-time
+          insight.</p>
+        <ul class="tags">
+          <li>LLMs</li>
+          <li>Agentic workflows</li>
+          <li>Pipelines</li>
         </ul>
-      </li>
-      <li class="role">
-        <div class="role-meta"><span>Jun - Aug 2025</span><span>Leapfrog Technology</span></div>
-        <h3>DevOps & SecOps Fellow</h3>
-        <ul>
-          <li>Architected secure multi-tier AWS infrastructure, lifting deployment reliability by 40%.</li>
-          <li>Built GitHub Actions CI/CD that cut manual deployment effort by 60%.</li>
-          <li>Stood up CloudWatch, GuardDuty and WAF observability, halving incident detection time.</li>
+      </article>
+      <article class="proj proj-feature">
+        <i class="ph ph-robot proj-ico"></i>
+        <h3>DevOps-AIOps Platform</h3>
+        <p>AI-driven monitoring with anomaly detection, plus MCP troubleshooting agents that resolve incidents without
+          paging a human.</p>
+        <ul class="tags">
+          <li>AIOps</li>
+          <li>MCP</li>
+          <li>Anomaly detection</li>
         </ul>
-      </li>
-      <li class="role">
-        <div class="role-meta"><span>May - Nov 2025</span><span>Yes Digital Pty. Ltd., Remote</span></div>
-        <h3>Technical SEO Specialist</h3>
-        <ul>
-          <li>Built programmatic SEO pipelines that generated landing pages at scale.</li>
-          <li>Improved Core Web Vitals for up to 30% faster load times.</li>
-          <li>Automated reporting in Python across GA4, GSC and GTM.</li>
+      </article>
+      <article class="proj">
+        <i class="ph ph-database proj-ico"></i>
+        <h3>Vector DB with RAG</h3>
+        <p>A vector database written from scratch in C++ with embedding pipelines and RAG, containerised to run
+          anywhere.</p>
+        <ul class="tags">
+          <li>C++</li>
+          <li>Docker</li>
+          <li>RAG</li>
         </ul>
-      </li>
-      <li class="role">
-        <div class="role-meta"><span>Feb - Apr 2025</span><span>HCLTech</span></div>
-        <h3>AI/ML Intern, Deployment</h3>
-        <ul>
-          <li>Dockerised and deployed ML models to Linux for reproducible inference.</li>
-          <li>Improved model accuracy by 12% with Optuna tuning and SHAP explainability.</li>
-        </ul>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- ============ PROJECTS (horizontal pan on desktop) ============ -->
-<section class="projects" id="projects">
-  <div class="proj-track" id="projTrack">
-    <div class="proj-intro">
-      <h2 class="sec-title">Selected builds</h2>
-      <p>Three systems where automation and AI do the on-call work.</p>
+      </article>
     </div>
-    <article class="proj">
-      <i class="ph ph-heartbeat proj-ico"></i>
-      <h3>Health Insights AI Agent</h3>
-      <p>An LLM-driven monitoring agent with automated data pipelines that turn raw health data into real-time insight.</p>
-      <ul class="tags"><li>LLMs</li><li>Agentic workflows</li><li>Pipelines</li></ul>
-    </article>
-    <article class="proj proj-feature">
-      <i class="ph ph-robot proj-ico"></i>
-      <h3>DevOps-AIOps Platform</h3>
-      <p>AI-driven monitoring with anomaly detection, plus MCP troubleshooting agents that resolve incidents without paging a human.</p>
-      <ul class="tags"><li>AIOps</li><li>MCP</li><li>Anomaly detection</li></ul>
-    </article>
-    <article class="proj">
-      <i class="ph ph-database proj-ico"></i>
-      <h3>Vector DB with RAG</h3>
-      <p>A vector database written from scratch in C++ with embedding pipelines and RAG, containerised to run anywhere.</p>
-      <ul class="tags"><li>C++</li><li>Docker</li><li>RAG</li></ul>
-    </article>
-  </div>
-</section>
+  </section>
 
-<!-- ============ CONTACT ============ -->
-<section class="contact" id="contact">
-  <div class="wrap">
-    <h2 class="contact-title" id="contactTitle">Got infrastructure that should run itself?</h2>
-    <a href="mailto:an.uurraag@outlook.com" class="btn btn-solid btn-lg">an.uurraag@outlook.com <i class="ph ph-arrow-up-right"></i></a>
-    <div class="contact-links">
-      <a href="https://www.linkedin.com/in/anuurraag/" target="_blank" rel="noopener"><i class="ph ph-linkedin-logo"></i>LinkedIn</a>
-      <a href="https://github.com/aneklavya" target="_blank" rel="noopener"><i class="ph ph-github-logo"></i>GitHub</a>
-      <a href="tel:+9779803532151"><i class="ph ph-phone"></i>+977 980 353 2151</a>
-          <a href="https://drive.google.com/file/d/1rtUgk07OgYxc_9o1_SP-j_1RU_Bh7XR9/view?usp=sharing" target="_blank" rel="noopener"><i class="ph ph-file-arrow-down"></i>Download CV</a>
+  <!-- ============ CONTACT ============ -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2 class="contact-title" id="contactTitle">Got infrastructure that should run itself?</h2>
+      <a href="mailto:an.uurraag@outlook.com" class="btn btn-solid btn-lg">an.uurraag@outlook.com <i
+          class="ph ph-arrow-up-right"></i></a>
+      <div class="contact-links">
+        <a href="https://www.linkedin.com/in/anuurraag/" target="_blank" rel="noopener"><i
+            class="ph ph-linkedin-logo"></i>LinkedIn</a>
+        <a href="https://github.com/aneklavya" target="_blank" rel="noopener"><i
+            class="ph ph-github-logo"></i>GitHub</a>
+        <a href="tel:+9779803532151"><i class="ph ph-phone"></i>+977 980 353 2151</a>
+        <a href="https://drive.google.com/file/d/1rtUgk07OgYxc_9o1_SP-j_1RU_Bh7XR9/view?usp=sharing" target="_blank"
+          rel="noopener"><i class="ph ph-file-arrow-down"></i>Download CV</a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<footer class="foot">
-  <div class="wrap foot-inner">
-    <span>&copy; 2026 Anurag Jha</span>
-    <a href="#top">Back to top <i class="ph ph-arrow-up"></i></a>
-  </div>
-</footer>
+  <footer class="foot">
+    <div class="wrap foot-inner">
+      <span>&copy; 2026 Anurag Jha</span>
+      <a href="#top">Back to top <i class="ph ph-arrow-up"></i></a>
+    </div>
+  </footer>
 
-<script type="module" src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
+
 </html>
